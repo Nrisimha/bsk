@@ -1,0 +1,44 @@
+1. encrypt/decrypt message with openssl
+To Encrypt:
+openssl enc -aes-256-cbc -in un_encrypted.data -out encrypted.data
+To Decrypt:
+openssl enc -d -aes-256-cbc -in encrypted.data -out un_encrypted.data
+
+2. sign/verify signature with openssl
+To generate keys pair:
+openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "$(whoami)s Sign Key.key" -out "$(whoami)s Sign Key.crt" -days 365 -subj "/C=NL/ST=Zuid Holland/L=Rotterdam/O=Sparkling Network/OU=IT Dept/CN=$(whoami)s Sign Key"
+To Sign:
+openssl dgst -sha256 -sign "$(whoami)s Sign Key.key" -out sign.txt.sha256 sign.txt 
+
+openssl dgst -sha256 -sign $privatekey -out /tmp/$filename.sha256 $filename
+openssl base64 -in /tmp/$filename.sha256 -out signature.sha256
+rm /tmp/$filename.sha256
+To verify:
+openssl base64 -d -in $signature -out /tmp/$filename.sha256
+openssl dgst -sha256 -verify $publickey -signature /tmp/$filename.sha256 $filename
+rm /tmp/$filename.sha256
+
+3. Port forwarding with private key (ssh):
+ssh user@host -i keyfile.pem -L 1234:127.0.0.1:2345
+
+4. GnuPG, create/recieve message
+gpg --export EMAIL > pubkey.asc
+gpg --import alicepubkey.asc
+gpg --edit-key Alice
+>trust
+To encrypt message:
+gpg --encrypt --recipient alice@gmail.com message-for-alice
+To decrypt message:
+gpg --decrypt message-for-me.gpg
+
+5. Create SSL certificate self-signed
+openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
+...
+openssl rsa -passin pass:x -in server.pass.key -out server.key
+writing RSA key
+rm server.pass.key
+openssl req -new -key server.key -out server.csr
+To generate self-signed SSL cert:
+openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
+
+14. John The Ripper

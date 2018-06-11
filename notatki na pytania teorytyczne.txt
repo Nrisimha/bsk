@@ -1,0 +1,180 @@
+1. RSA
+BOB: m = 89 (message)
+ALICE: p1 = 53, p2 = 59
+n = 53*59 = 3127
+ф(n) = (53-1)*(59-1) = 3016 - Euler's function
+e = 3 (public small exponent, odd number, not share a factor with ф(n))
+d = (k*(3016) + 1 )/ 3 = 2011
+
+(n, e) - PUBLIC KEY
+BOB: m^e mod n = c - encrypted message
+ALICE: c^d = m mod n - (m decrypted)
+see more: https://www.youtube.com/watch?v=wXB-V_Keiu8&t=33s
+
+2. AES-128
+10 rounds (9 + 1)
+s-block table
+rcon table 
+
+addRoundKey
+
+subBytes
+shiftRows
+mixColumns
+addRoundKey
+
+subBytes
+shiftRows
+addRoundKey
+
+see more: https://www.youtube.com/watch?v=gP4PqVGudtg
+
+3. SSH steps of connection
+-1- Exchange of identification strings
+Client send version of ssh, server response with his version
+-2- Negotiation of algorithms
+Client send list of his algorythms, server response with his list and choose first algo that it can handle. Than both side choose p,g and q params.
+-3- Key exchange
+Client:
+generate random x (1<x<q) and calc: e = g^x mod p
+Server: 
+generate random y (1<y<q) and calc: f = g^y mod p, K = e^y mod p, H = hash(<long formula>), sign H with private key and save result as s and send to client: K_S~||~f~||~s
+Now both sides have key K, vallue H is used as id of session. With K and H init vectors and keys for comunication are generated.
+
+4. Port forwarding
+-LOCAL-
+--case 1--
+Na zdalnym serwerze działa serwer pocztowy, z którym można się połączyć przy użyciu zdalnego portu 110.
+Nie chcemy łączyć się z tym portem bezpośrednio, bo wtedy każdy mógłby podejrzeć naszą korespondencję...;
+Ale możemy połączyć się ze zdalnym serwerem przez SSH - utworzymy tunel;
+Możemy zdefiniować połączenie w taki sposób, że cały ruch na lokalny port 9999 będzie przetunelowany do zdalnego portu 110 przez tunel SSH;
+W ten sposób, nikt nie podejrzy naszej korespondencji;
+--case 2-- 
+pracujemy w sieci lokalnej, w której administratorzy są paranoikami i nie pozwalają w wolnej chwili czytania wiadomości na portalu (tu wstaw nazwę swojego ulubionego portalu);
+mamy jednek dostęp do serwera SSH, z którego możemy przeglądać nasz ulubiony portal;
+znów robimy tunelowanie lokalnego portu 9999 w taki sposób, aby każde zapytanie na port 9999 zostało przekierowane na określony port widoczny z serwera SSH;
+-REMOTE-
+--case 1--
+Pracujemy w firmie, w której nasz komputer jest za firewallem i nie możemy się do niego połączyć spoza sieci firmowej;
+Możemy z komputera w sieci firmowej zalogować się do jakiegoś serwera SSH poza siecią firmową i powiedzieć, że każde zapytanie, które będzie skierowane na port 9999 na zdalnym serwerze będzie przekierowane na pewien port widoczny z komputera w sieci firmowej;
+UWAGA Takie tunelowanie portów wymaga dodatkowej konfiguracji w serwerze SSH;
+
+5. Connection in SSL/TLS protocol
+-1- client requests a SSL connection (SSL Hello)
+-2- server response with the SSL certificate (with includes the public key; SSL done)
+-3- client validates the certificate/public key (in cert has public key of server and signature of CA (cert authority), client checks is it valid)
+-4- client generates a symetric key (aka session key) and transmits it to the server 
+-5- SSL session is established
+
+see more: https://www.youtube.com/watch?v=4nGrOpo0Cuc
+
+6. PKI
+
+see more: https://www.youtube.com/watch?v=i-rtxrEz_E8
+
+7. GPG packet, functionality
+GnuPG allows you to encrypt and sign your data and communications; it features a versatile key management system, along with access modules for all kinds of public key directories. 
+$ gpg --import blake.gpg
+$ gpg --edit-key blake@cyb.org
+>fpr #for checking fingerprint
+>sign
+>check
+>trust 
+
+-Podpis cyfrowy-
+--1-- Obliczamy skrót wiadomości przy użyciu funkcji SHA1
+--2-- Składamy podpis przy użyciu algorytmu RSA albo DSS.
+-Szyfrowanie komunikatu-
+--1-- Nadawca generuje klucz sesji
+--2-- Szyfruje klucz sesji przy pomocy klucza publicznego adresata używając algorytmu RSA lub ElGamal
+--3-- Komunikat jest szyfrowany przy użyciu klucza sesji używając algorytmu CAST-128, IDEA albo 3DES
+--4-- Wiadmość składa się z zaszyfrowanego komunikatu i zaszyfrowanego klucza
+-Kompresja-
+--1-- Komunikat można skompresować przy użyciu algorytmu ZIP, aby był krótszy
+-Kompatybilność z systemami e-mail-
+--1-- Aby wiadomość można było wysłać za pomocą dowolnej usługi poczty elektronicznej wiadomość kompresuje się do ciągu znaków ASCII przy pomocy schematu radix-64.
+
+see more: https://www.coursera.org/learn/design-secure-networked-systems/lecture/ZFY7V/web-of-trust
+
+8. GPG, Web of Trust
+
+see more: https://www.coursera.org/learn/design-secure-networked-systems/lecture/ZFY7V/web-of-trust
+
+9. Virtual Private Network
+
+
+12. Steganografia - nauka o komunikacji w taki sposób, by obecność komunikatu nie mogła zostać wykryta. W odróżnieniu od kryptografii (gdzie obecność komunikatu nie jest negowana, natomiast jego treść jest niejawna) steganografia próbuje ukryć fakt prowadzenia komunikacji.
+
+14. Blind Signatures, David Chaum
+(on base of RSA)
+p1 = 53, p2 = 59
+n = 53*59 = 3127
+ф(n) = (53-1)*(59-1) = 3016 
+e = 3
+d = (k*(3016) + 1 )/ 3 = 2011
+MESSAGE: 89
+now, Chaum comes in:
+r = 48 - random, 0<r<n
+m*r^e mod n = m'
+89*48^3 mod 3127 = 2019
+s' = m'^d mod n 
+s' = 1144
+s = s' * r^(-1) mod n - where r^(-1) = 2671 is an inverse of r
+s = 545
+s^e = m mod n
+545^3 mod 3127 = 89 !!!
+
+
+see more: https://www.youtube.com/watch?v=3oGbfVn27j8
+
+15. Goofy and Sknerusa (Scroog) system
+-System Goofy'ego-
+
+--1-- Goofy może stworzyć swoją monetę, taka moneta będzie zawierała informację o jej twórcy, będzie miała unikalny numer i będzie podpisana kluczem Goofy'ego
+--2-- Goofy może przekazać monetę Alicji. Czyli tworzy nową monetę, w której jest haszowana referencja na stworzoną monetę, jest informacja, że to Alicja jest posiadaczem tej monety i jest podpis Goofy'ego
+--3-- Alicja może przekazać monetę dalej, czyli tworzy nową monetę z dowiązaniem haszowanym na swoją monetę, wpisuje nowego właściciela monety i podpisuje tą monetę
+--Wady?--
+Nikt nie kontroluje, czy Alicja nie wyda tej samej monety dwa razy
+
+System Sknerusa
+
+--_--Podobne do systemu Goofy'ego, ale każda transakcja musi być zaakceptowana i podpisana przez wydawcę monety.
+
+--Wady?--
+Sknerus ma taką samą kontrolę nad wszystkim jak bank
+
+17. WEP
+2 dlugosci klucza o ktorych mowi sie ze sa 64 i 128bit ale tak na prawde to 40 i 104bit bo ostatnie 3 bajty (uzupelniajace nam brakujace 24 bity) to tak zwany IV - wektor inicjalizacji, ktory choc jest inny dla kazdego pakietu to sie praktycznie nie liczy (dlaczego? wyjasnie dalej). Te 40 albo 104 bity to wlasnie jest 5 albo 13 bajtow klucza (PSK) ktory ustawiamy konfigurujac siec.
+
+WEP szyfruje tylko pakiety danych, nie szyfruje pakietow zarzadzajacych siecia (management frames) bo nie moze - nie mialoby to sensu... tak samo tylko dane sa zakodowane a naglowki nie - tak samo nie jest logiczne kodowac naglowki 
+
+Wprowadzenie:
+Do szyfrowania WEP uzywa RC4 jako zrodla losowych ciagow i prostego, wydajnego, TANIEGO i latwego w implementacji... XOR'a :-) 
+
+RC4 dostaje 2 parametry: 1) IV (inne dla 'kazdego' pakietu) + PSK, 2) dlugosc danych do zaszyfrowania (dlugosc plaintext'u P)... Na wyjsciu dostajemy pseudolosowy ciag znakow (nazwijmy go R) o dlugosci takiej samej jak dlugosc danych... i na tym leci XOR. 
+
+P xor R = C (ciphertext)
+C xor R = P <-- z definicji XOR'a
+
+To nie koniec. Kazdy pakiet danych ma dodawana sume kontrolna - najzwyklejsze CRC32 dajace jak nazwa mowi 4 bajty danych (oznaczmy je jako CRC).
+
+Wlasciwy przebieg szyfrowania:
+--1-- IV + PSK daje klucz szyfrujacy dla danego pakietu
+--2-- To trafia do RC4 razem z dlugoscia P, zwraca R
+--3-- P + CRC (zwyczajnie doklejone na koncu danych) xor R --> C
+
+Co jest zle tutaj? Wyglada ok? Nie do konca  bo IV (24 bity) jest przesylany jako plain-text w pakiecie, wiec to wlasnie skraca efektywnie sile szfrowania do 40 albo 104 bit (bo tylko tego atakujacy nie jest w stanie wyliczyc od reki).
+
+Deszyfrowanie:
+--1-- znamy IV oraz C... mozemy pracowac
+--2-- IV + WEP (PSK ktory znamy) traktujemy RC4 (dlugosc danych przed i po XORowaniu jest taka sama) - mamy nasze R
+--3-- C xor R --> P + CRC
+--4-- Odcinamy 3 bajty z konca, liczmy CRC32 po tym co zostalo, porownujemy z tym CRC co przyszlo w zaszyfrowanym pakiecie
+--5-- Jesli wartosci sie zgadzaja to pakiet jest ok i go przyjmujemy... jesli nie to go olewamy
+
+Gdzie jest problem?
+Problemow jest cala seria... niektore z nich to:
+--1-- IV jest za krotki aby byc na prawde unikatowy dla kazdego pakiety
+--2-- brak zabezpieczenia przed powtornym wyslaniem 'tego samego' pakietu i slabe sprawdzanie czy pakiet nie zostal zmodyfikowany
+--3-- brak mozliwosci zmiany klucza "w locie"
+
