@@ -1,0 +1,145 @@
+docker run helloworld
+doxker images ls
+ docker run -it iP nginx
+
+docker images
+docker ps
+docker inspect ...<--id of image
+
+./john --format=Raw-MD5 --wordlist=~/bsk_lecture_notes/lab_02/słownik/slowa.txt ~/bsk_lecture_notes/lab_02/hashes1   <- scieszka do pliku z haszami
+poczytać o przełączniku --rules (dla hashes2)
+dodawanie nowych regul do john.conf pozwoli zlamac nowe haszy
+
+Az"[0-9]"
+для третьего
+cAz"[0-9]"
+для второго там по другому
+Az"[_.@-][0-9]"
+В hashes6 
+--rules=Jumbo
+и он найдёт
+Только надо подождать подольше, у меня минуты 3-4 искало
+Джубмо - стандартное правило там
+cAz"[,.!?@#_][0-9]"
+gng
+gna - with gnu
+cleopatra
+
+
+openssl aes-256-cbc -in hidden_zip -d -iv 81f9372d4417bfd7 -k f0c8b49612bc06130a212637eca7ae01
+
+b8cb604983836838ef31e6403b62fa7f2568a44aa6f4251fd9856fd24887961fc48ee4ca46f3be14421d0caae83f1aa92c82c6503afa9edb4be5c9d000d505b5
+
+docker run -it pawelbogdan/bsk:lecture_5
+ls ~/.gnupg/
+gpg --list-secret-keys
+gpg --list-kyes #wyswietla pierszczen kluczy publicznych
+gpg --decrypt message1.asc #bsk to haslo
+albo 
+gpg -d message1.asc
+gpg --import test.key  #importowanie do pierszczenia klucza
+
+gpg --edit-key id-of-key #ostatnie 8 znakow
+trust
+5
+quit
+
+gpg --edit-key DEDEAE...
+trust
+4
+sign #sign with our private key
+
+gpg --full-generate-key
+1
+
+0
+
+#dane o personie
+#teraz wysylamy swoj klucz na server
+gpg --keyserver pgp.mit.edu --send-key id-of-key
+gpg --keyserver pgp.mit.edu --recv-key id-of-key
+
+gpg --local-user id-of-key-that-use-to-sign --edit-key id-of-key-to-edit
+trust 
+4
+fpr #odcisk klucza, dzwonie do kolegi i pytam czy sie zgadza
+sign
+quit
+gpg --keyserver pgp.mit.edu --send-key id-of-key #wysylamy podpisany klucz
+
+
+
+#uzycie podpisania i szyfrowania
+gpg --sign --local-user id-of-key plik.jpg #generuje plik razem z podpisem
+gpg --clearsign --local-user id-of-key plik.jpg #generuje pli z podpisem i radix
+gpg --armour --detach-sign --local-user id-of-key plik.jpg #teraz podpis w osobnym pliku
+mvn archetype:generate -DgroupId=com.test -DartifactId=SMOKTestServer -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+
+docker exec -ti <containerId> /bin/bash
+
+sudo apt-get update
+sudo apt-get install openvpn easy-rsa
+make-cadir ~/openvpn-ca
+cd ~/openvpn-ca
+nano vars
+export KEY_COUNTRY="PL"
+export KEY_PROVINCE="KR"
+export KEY_CITY="Krakow"
+export KEY_ORG="UJ"
+export KEY_EMAIL="admin@uj.edu.pl"
+export KEY_OU="Community"
+
+export KEY_NAME="server"
+cd ~/openvpn-ca
+source vars
+./clean-all
+ln -s openssl-1.0.0.cnf openssl.cnf
+./build-ca
+
+
+
+sudo apt-get install openvpn
+sudo mkdir /etc/openvpn/easy-rsa/
+sudo cp -r /usr/share/doc/openvpn/examples/easy-rsa/2.0/* /etc/openvpn/easy-rsa/
+sudo vim /etc/openvpn/easy-rsa/vars
+sudo su
+source vars
+./clean-all
+./build-ca 
+./build-key-server SERVERNAME
+./build-dh 
+
+
+
+sudo docker volume create --name $OVPN_DATA
+sudo docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_genconfig -u udp://VPN.SERVERNAME.COM
+sudo docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn ovpn_initpki
+sudo docker run -v $OVPN_DATA:/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN kylemanna/openvpn
+sudo docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full CLIENTNAME nopass
+sudo docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+
+
+sudo cat >sudo /etc/ppp/options.l2tpd.client <<EOF
+ipcp-accept-local
+ipcp-accept-remote
+refuse-eap
+require-chap
+noccp
+noauth
+mtu 1280
+mru 1280
+noipdefault
+defaultroute
+usepeerdns
+connect-delay 5000
+name $VPN_USER
+password $VPN_PASSWORD
+EOF
+
+
+
+Query String (ex 8 SQL injection mitigrations):
+column=case when(SELECT * FROM SERVERS) then 1 else 2 -- gives all rows from 
+
+us-cdbr-iron-east-05.cleardb.net
+mysql://b3e4663a89fbd0:275bba62@us-cdbr-iron-east-04.cleardb.net/heroku_ceb405cc5f74f18?reconnect=true
